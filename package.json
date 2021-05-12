@@ -6,13 +6,14 @@
   "author": "Paweł Pankiewicz <pawelp6020@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev":"nodemon worker.js"
+    "dev": "nodemon worker.js"
   },
   "dependencies": {
     "camunda-external-task-client-js": "^2.1.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.7"
+    "nodemon": "^2.0.7",
+    "open": "^8.0.7"
   },
   "nodemonConfig": {}
 }

@@ -15,7 +15,7 @@ const config = {
 const client = new Client(config);
 
 // susbscribe to the topic: 'charge-card'
-client.subscribe("charge-card", async function ({ task, taskService }) {
+client.subscribe("remove_item_from_inventory", async function ({ task, taskService }) {
   // Put your business logic here
 
   // Get a process variable
