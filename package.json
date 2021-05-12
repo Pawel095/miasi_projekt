@@ -1,0 +1,19 @@
+{
+  "name": "Projekt",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/Pawel095/miasi_projekt.git",
+  "author": "Paweł Pankiewicz <pawelp6020@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "nodemon worker.js"
+  },
+  "dependencies": {
+    "camunda-external-task-client-js": "^2.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "open": "^8.0.7"
+  },
+  "nodemonConfig": {}
+}
