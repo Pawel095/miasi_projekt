@@ -1,0 +1,21 @@
+{
+  "name": "charge-card-worker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "nodemonConfig": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon worker.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "camunda-external-task-client-js": "^2.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "open": "^8.0.8"
+  }
+}
