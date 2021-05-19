@@ -4,6 +4,7 @@
   "main": "index.js",
   "repository": "https://github.com/Pawel095/miasi_projekt.git",
   "author": "Paweł Pankiewicz <pawelp6020@gmail.com>",
+  "contributors": ["Wojciech Lesiak <logox98@gmail.com>","Cezary Palewicz <14cezar@wp.pl>"],
   "license": "MIT",
   "scripts": {
     "dev": "nodemon worker.js"
