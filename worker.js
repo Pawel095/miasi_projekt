@@ -1,16 +1,16 @@
 const {
-    Client,
-    logger,
-    Variables,
+  Client,
+  logger,
+  Variables,
 } = require("camunda-external-task-client-js");
 const { leki, zamowioneleki } = require("./baza_danych.js");
+const nodemailer = require("nodemailer");
 
 const config = {
-    baseUrl: "http://localhost:8080/engine-rest",
-    use: logger,
-    asyncResponseTimeout: 100,
+  baseUrl: "http://localhost:8080/engine-rest",
+  use: logger,
+  asyncResponseTimeout: 100,
 };
-
 const client = new Client(config);
 
 client.subscribe("check_warehouse_state", async function ({ task, taskService }) {
@@ -38,21 +38,8 @@ client.subscribe("check_orders", async function ({ task, taskService }) {
 
 });
 
-const {
-  Client,
-  logger,
-  Variables,
-} = require("camunda-external-task-client-js");
-const { leki } = require("./baza_danych.js");
-const nodemailer = require("nodemailer");
 
-const config = {
-  baseUrl: "http://localhost:8080/engine-rest",
-  use: logger,
-  asyncResponseTimeout: 100,
-};
 
-const client = new Client(config);
 
 client.subscribe(
   "remove_item_from_inventory",
