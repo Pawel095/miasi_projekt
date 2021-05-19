@@ -59,18 +59,6 @@ client.subscribe(
   }
 );
 
-const { Client, logger, Variables } = require("camunda-external-task-client-js");
-const open = require("open");
-const {leki } = require("./baza_danych.js")
-const config = {
-  baseUrl: "http://localhost:8080/engine-rest",
-  use: logger,
-  asyncResponseTimeout: 10000,
-};
-
-const client = new Client(config);
-const nodemailer = require("nodemailer");
-
 client.subscribe("send_message",async ({ task, taskService }) => {
 
     const transport = nodemailer.createTransport({
