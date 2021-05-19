@@ -16,9 +16,27 @@ const client = new Client(config);
 client.subscribe(
   "remove_item_from_inventory",
   async ({ task, taskService }) => {
+
     const i = task.variables.get("loopCounter");
+    let lista = task.variables.get("ListaLekow");
+
+    let med = leki.filter((e) => parseInt(e.id) === parseInt(lista[i].id))[0];
+    console.log(med);
+    leki.map((e) => {
+      if (e.id === med.id) {
+        e.ilosc -= 1;
+        console.log(e);
+      }
+      return e;
+    });
     console.log(leki);
-    console.log(task.variables.getAll());
-    await taskService.complete(task, var1);
+    await taskService.complete(task);
+  }
+);
+
+client.subscribe(
+  "SendEmailAboutPackageDetails",
+  async ({ task, taskService }) => {
+    await taskService.complete(task);
   }
 );
