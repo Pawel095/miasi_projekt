@@ -29,13 +29,14 @@ client.subscribe(
     console.log("Sprawdzono", lacking_medicines_count);
   }
 );
+
 client.subscribe("check_orders", async function ({ task, taskService }) {
   console.log("Sprawdzanie czy leki już zamówione");
   var lacking_medicines = leki.filter((i) => i.ilosc == 0);
   console.log(lacking_medicines);
   console.log(zamowioneleki);
   lacking_medicines = lacking_medicines.filter((i) =>
-    zamowioneleki.includes(i.nazwa)
+    !zamowioneleki.includes(i.nazwa)
   );
   var lacking_orders_names = "";
   lacking_medicines.forEach((element) => {
@@ -127,12 +128,12 @@ client.subscribe("check_availability", async function ({ task, taskService }) {
   var medicines = [];
   for (i in drugs) {
     var item = drugs[i].split("A");
-    var finded = leki.find((i) => i.id == item[0]);
-    if (finded == null) {
+    var found = leki.find((i) => i.id == item[0]);
+    if (found == null) {
       medicines.push({ id: item[0], status: "NOTOK", ile: item[1] });
       //await taskService.handleBpmnError(task, "1");
       errorFlag = 1;
-    } else if (finded.ilosc > item[1]) {
+    } else if (found.ilosc > item[1]) {
       medicines.push({ id: item[0], status: "OK", ile: item[1] });
     } else {
       medicines.push({ id: item[0], status: "NOTOK", ile: item[1] });
@@ -145,6 +146,7 @@ client.subscribe("check_availability", async function ({ task, taskService }) {
 
   if (errorFlag == 1) {
     await taskService.handleBpmnError(task, "1", "Error", processVariables);
+    return;
   }
 
   //console.log(medicines);
@@ -162,14 +164,17 @@ client.subscribe("show_place", async function ({ task, taskService }) {
   });
 
   var places = [];
+  var total = 0;
   for (i in drugs) {
     var item = drugs[i].split("A");
-    var finded = leki.find((i) => i.id == item[0]);
-
-    places.push({ id: item[0], ile: item[1], pozycja: finded.poz });
+    var found = leki.find((i) => i.id == item[0]);
+    total += Number.parseInt(item[1]);
+    places.push({ id: item[0], ile: item[1], pozycja: found.poz });
   }
 
-  const processVariables = new Variables().set("medicine_places", places);
+  const processVariables = new Variables()
+    .set("medicine_places", places)
+    .set("medicine_amount", total);
 
   console.log(places);
   await taskService.complete(task, processVariables);
@@ -185,23 +190,23 @@ client.subscribe("check_replacement", async function ({ task, taskService }) {
   for (i in medicine_status) {
     if (medicine_status[i]["status"] == "NOTOK") {
       var oryginal_id = medicine_status[i]["id"];
-      var finded = leki.find((i) => i.id == oryginal_id);
+      var found = leki.find((i) => i.id == oryginal_id);
       var ile = medicine_status[i]["ile"];
 
-      var zam_id = finded["zam"][0];
-      var finded_zam = leki.find((i) => i.id == zam_id);
-      if (finded["zam"][0] == null) {
+      var zam_id = found["zam"][0];
+      var found_zam = leki.find((i) => i.id == zam_id);
+      if (found["zam"][0] == null) {
         console.log("Nie ma zamiennika do tego leku");
         await taskService.handleBpmnError(task, "2");
       } else {
-        var zam_id = finded["zam"][0];
-        var finded_zam = leki.find((i) => i.id == zam_id);
+        var zam_id = found["zam"][0];
+        var found_zam = leki.find((i) => i.id == zam_id);
 
-        if (finded_zam.ilosc < medicine_status[i]["ile"]) {
+        if (found_zam.ilosc < medicine_status[i]["ile"]) {
           console.log("Brak zamiennika w takiej ilości");
           await taskService.handleBpmnError(task, "2");
         } else
-          new_code += "I" + finded["zam"][0] + "A" + medicine_status[i]["ile"];
+          new_code += "I" + found["zam"][0] + "A" + medicine_status[i]["ile"];
       }
     } else {
       new_code +=
