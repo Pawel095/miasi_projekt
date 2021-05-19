@@ -1,4 +1,4 @@
-leki = [
+exports.leki = [
   { id: 1, nazwa: "Panadol", ilosc: 3, zam: [4], poz: "a-2" },
   { id: 2, nazwa: "Fenistil", ilosc: 3, zam: [], poz: "b-11" },
   { id: 3, nazwa: "Uniben", ilosc: 3, zam: [5], poz: "gamma-7" },

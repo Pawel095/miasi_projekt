@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_05wwqjs" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.8.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.14.0">
+  <bpmn:collaboration id="Collaboration_0vl954d">
+    <bpmn:participant id="Participant_0swr5o6" name="System do zarządzania magazynem leków" processRef="Process_0twxad6" />
+    <bpmn:participant id="Participant_02v1akn" name="Pacjent" processRef="Process_1kceoed" />
+    <bpmn:messageFlow id="Flow_0xwhdyp" sourceRef="Event_1qmmjyh" targetRef="Participant_02v1akn" />
+  </bpmn:collaboration>
+  <bpmn:process id="Process_0twxad6" isExecutable="true">
+    <bpmn:userTask id="Activity_0evjqy8" name="Wyślij paczkę i fakturę" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="packageSent" label="Czy Paczka została wysłana" type="string" defaultValue="Tak" />
+        </camunda:formData>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0pnot88</bpmn:incoming>
+      <bpmn:outgoing>Flow_16qfd0o</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:startEvent id="Event_17uyspu">
+      <bpmn:outgoing>Flow_0v4tnqh</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:task id="Temp_task" name="Tymczasowy task zwracający leki">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="medicine_amount">${3}</camunda:outputParameter>
+          <camunda:outputParameter name="ListaLekow">
+            <camunda:script scriptFormat="javascript">S([{ "id": "2", "ile": "2", "pozycja": "b-11" },{ "id": "5", "ile": "5", "pozycja": "hesoyam" },{ "id": "1", "ile": "1", "pozycja": "a-2" }],"application/json")</camunda:script>
+          </camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0v4tnqh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0icvu6h</bpmn:outgoing>
+    </bpmn:task>
+    <bpmn:subProcess id="Activity_014j9of" name="Przygotowanie zamówienia">
+      <bpmn:incoming>Flow_1itsz7x</bpmn:incoming>
+      <bpmn:outgoing>Flow_0pnot88</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true">
+        <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">3</bpmn:loopCardinality>
+      </bpmn:multiInstanceLoopCharacteristics>
+      <bpmn:startEvent id="Event_1l1woqh">
+        <bpmn:outgoing>Flow_0fjkrfz</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="Activity_1byd3zz" name="Zeksanuj lek" camunda:assignee="demo">
+        <bpmn:extensionElements>
+          <camunda:formData>
+            <camunda:formField id="IDLeku" label="ID leku" type="long" />
+          </camunda:formData>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_0fjkrfz</bpmn:incoming>
+        <bpmn:outgoing>Flow_1bgvclu</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:serviceTask id="removeFromInventory" name="Zdejmij ze stanu" camunda:type="external" camunda:topic="remove_item_from_inventory">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="ListaLekowJson">
+              <camunda:script scriptFormat="javascript">S(execution.getVariable("ListaLekow"),'application/json')</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="Output_065mknl" />
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_1bgvclu</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ah0alk</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="Event_18xhnna" name="Koniec">
+        <bpmn:incoming>Flow_0ah0alk</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0ah0alk" sourceRef="removeFromInventory" targetRef="Event_18xhnna" />
+      <bpmn:sequenceFlow id="Flow_1bgvclu" sourceRef="Activity_1byd3zz" targetRef="removeFromInventory" />
+      <bpmn:sequenceFlow id="Flow_0fjkrfz" sourceRef="Event_1l1woqh" targetRef="Activity_1byd3zz" />
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0pnot88" sourceRef="Activity_014j9of" targetRef="Activity_0evjqy8" />
+    <bpmn:sequenceFlow id="Flow_1h8enn0" sourceRef="Event_1qmmjyh" targetRef="Event_14i7rly" />
+    <bpmn:sequenceFlow id="Flow_1itsz7x" sourceRef="CollectDrugs" targetRef="Activity_014j9of" />
+    <bpmn:sequenceFlow id="Flow_0icvu6h" sourceRef="Temp_task" targetRef="CollectDrugs" />
+    <bpmn:sequenceFlow id="Flow_0v4tnqh" sourceRef="Event_17uyspu" targetRef="Temp_task" />
+    <bpmn:userTask id="CollectDrugs" name="Weź leki ze wskazanego miejsca" camunda:assignee="demo">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="AreCollected" label="Czy wszystkie zebrane? ${humanizedMedList}" type="string" defaultValue="Tak" />
+        </camunda:formData>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="humanizedMedList">
+            <camunda:script scriptFormat="javascript">var ret = "";
+var datjson = JSON.parse(ListaLekow);
+for(i in datjson){
+ ret = ret +" ID: "+datjson[i].id+", "+datjson[i].ile+" sztuk, półka: "+datjson[i].pozycja+"|||";
+}
+ret;</camunda:script>
+          </camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0icvu6h</bpmn:incoming>
+      <bpmn:outgoing>Flow_1itsz7x</bpmn:outgoing>
+      <bpmn:standardLoopCharacteristics />
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_16qfd0o" sourceRef="Activity_0evjqy8" targetRef="Event_1qmmjyh" />
+    <bpmn:endEvent id="Event_14i7rly" name="Zamówienie zrealizowane">
+      <bpmn:incoming>Flow_1h8enn0</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateThrowEvent id="Event_1qmmjyh" name="Informacja o wysyłce zamówienia">
+      <bpmn:incoming>Flow_16qfd0o</bpmn:incoming>
+      <bpmn:outgoing>Flow_1h8enn0</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0srjel9" camunda:type="external" camunda:topic="SendEmailAboutPackageDetails" />
+    </bpmn:intermediateThrowEvent>
+  </bpmn:process>
+  <bpmn:message id="Message_166ozox" name="InitialStartMessage" />
+  <bpmn:process id="Process_1kceoed" isExecutable="false" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0vl954d">
+      <bpmndi:BPMNShape id="Participant_0swr5o6_di" bpmnElement="Participant_0swr5o6" isHorizontal="true">
+        <dc:Bounds x="160" y="170" width="1052" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_16qfd0o_di" bpmnElement="Flow_16qfd0o">
+        <di:waypoint x="1000" y="350" />
+        <di:waypoint x="1052" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0v4tnqh_di" bpmnElement="Flow_0v4tnqh">
+        <di:waypoint x="248" y="230" />
+        <di:waypoint x="300" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0icvu6h_di" bpmnElement="Flow_0icvu6h">
+        <di:waypoint x="400" y="230" />
+        <di:waypoint x="450" y="230" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1itsz7x_di" bpmnElement="Flow_1itsz7x">
+        <di:waypoint x="500" y="270" />
+        <di:waypoint x="500" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1h8enn0_di" bpmnElement="Flow_1h8enn0">
+        <di:waypoint x="1088" y="350" />
+        <di:waypoint x="1142" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0pnot88_di" bpmnElement="Flow_0pnot88">
+        <di:waypoint x="850" y="350" />
+        <di:waypoint x="900" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_0evjqy8_di" bpmnElement="Activity_0evjqy8">
+        <dc:Bounds x="900" y="310" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_17uyspu_di" bpmnElement="Event_17uyspu">
+        <dc:Bounds x="212" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0o4849n_di" bpmnElement="Temp_task">
+        <dc:Bounds x="300" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_014j9of_di" bpmnElement="Activity_014j9of" isExpanded="true">
+        <dc:Bounds x="450" y="300" width="400" height="200" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0fjkrfz_di" bpmnElement="Flow_0fjkrfz">
+        <di:waypoint x="508" y="390" />
+        <di:waypoint x="530" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1bgvclu_di" bpmnElement="Flow_1bgvclu">
+        <di:waypoint x="630" y="390" />
+        <di:waypoint x="660" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ah0alk_di" bpmnElement="Flow_0ah0alk">
+        <di:waypoint x="760" y="390" />
+        <di:waypoint x="792" y="390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Event_1l1woqh_di" bpmnElement="Event_1l1woqh">
+        <dc:Bounds x="472" y="372" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1byd3zz_di" bpmnElement="Activity_1byd3zz">
+        <dc:Bounds x="530" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1vzmjhz_di" bpmnElement="removeFromInventory">
+        <dc:Bounds x="660" y="350" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_18xhnna_di" bpmnElement="Event_18xhnna">
+        <dc:Bounds x="792" y="372" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="793" y="415" width="35" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0u4gl8v_di" bpmnElement="CollectDrugs">
+        <dc:Bounds x="450" y="190" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_14i7rly_di" bpmnElement="Event_14i7rly">
+        <dc:Bounds x="1142" y="332" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1128" y="375" width="64" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1qmmjyh_di" bpmnElement="Event_1qmmjyh">
+        <dc:Bounds x="1052" y="332" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1039" y="378" width="61" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Participant_02v1akn_di" bpmnElement="Participant_02v1akn" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1052" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0xwhdyp_di" bpmnElement="Flow_0xwhdyp">
+        <di:waypoint x="1070" y="332" />
+        <di:waypoint x="1070" y="140" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
