@@ -35,8 +35,8 @@ client.subscribe("check_orders", async function ({ task, taskService }) {
   var lacking_medicines = leki.filter((i) => i.ilosc == 0);
   console.log(lacking_medicines);
   console.log(zamowioneleki);
-  lacking_medicines = lacking_medicines.filter((i) =>
-    !zamowioneleki.includes(i.nazwa)
+  lacking_medicines = lacking_medicines.filter(
+    (i) => !zamowioneleki.includes(i.nazwa)
   );
   var lacking_orders_names = "";
   lacking_medicines.forEach((element) => {
@@ -48,25 +48,25 @@ client.subscribe("check_orders", async function ({ task, taskService }) {
   await taskService.complete(task, processVariables);
 });
 
-client.subscribe(
-  "remove_item_from_inventory",
-  async ({ task, taskService }) => {
-    const i = task.variables.get("loopCounter");
-    let lista = task.variables.get("ListaLekow");
+client.subscribe("removeFromInventory", async ({ task, taskService }) => {
+  const i = task.variables.get("loopCounter");
+  let lista = task.variables.get("medicine_places");
+  const scannedId = task.variables.get("IDLeku");
 
-    let med = leki.filter((e) => parseInt(e.id) === parseInt(lista[i].id))[0];
-    console.log(med);
-    leki.map((e) => {
-      if (e.id === med.id) {
-        e.ilosc -= 1;
-        console.log(e);
-      }
-      return e;
-    });
-    console.log(leki);
-    await taskService.complete(task);
-  }
-);
+  let med = leki.filter((e) => parseInt(e.id) === parseInt(scannedId))[0];
+  // TODO: czy scannedId jest w liście leków do zabrania
+
+  console.log("med", med);
+  leki.map((e) => {
+    if (e.id === med.id) {
+      e.ilosc -= 1;
+      console.log(e);
+    }
+    return e;
+  });
+  console.log(leki);
+  await taskService.complete(task);
+});
 
 client.subscribe(
   "SendEmailAboutPackageDetails",
