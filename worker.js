@@ -185,6 +185,7 @@ client.subscribe("check_replacement", async function ({ task, taskService }) {
   var medicine_status = task.variables.getAll()["medicine_status"];
   console.log(medicine_status);
 
+  var zamienniki="Można zamienić brakujące leki: ";
   var new_code = "";
   console.log("Zamienniki");
   for (i in medicine_status) {
@@ -207,6 +208,7 @@ client.subscribe("check_replacement", async function ({ task, taskService }) {
           await taskService.handleBpmnError(task, "2");
         } else
           new_code += "I" + found["zam"][0] + "A" + medicine_status[i]["ile"];
+          zamienniki += found_zam.nazwa + " zamiast " + found.nazwa + " ";
       }
     } else {
       new_code +=
@@ -215,7 +217,7 @@ client.subscribe("check_replacement", async function ({ task, taskService }) {
   }
   console.log(new_code);
 
-  const processVariables = new Variables().set("code", new_code);
+  const processVariables = new Variables().set("code", new_code).set("zamienniki", zamienniki);
 
   //const processVariables = new Variables().set("medicine_amount", i+1);
 
