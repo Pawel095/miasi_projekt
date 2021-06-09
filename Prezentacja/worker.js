@@ -133,7 +133,7 @@ client.subscribe("check_availability", async function ({ task, taskService }) {
       medicines.push({ id: item[0], status: "NOTOK", ile: item[1] });
       //await taskService.handleBpmnError(task, "1");
       errorFlag = 1;
-    } else if (found.ilosc > item[1]) {
+    } else if (found.ilosc >= item[1]) {
       medicines.push({ id: item[0], status: "OK", ile: item[1] });
     } else {
       medicines.push({ id: item[0], status: "NOTOK", ile: item[1] });
